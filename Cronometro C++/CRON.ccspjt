@@ -1,0 +1,19 @@
+[PROJECT]
+Target=CRON.hex
+Processor_Text=PIC16F877A
+CCSVersion=5.015
+Compiler=PCM
+[Target Data]
+FileList=CRON.c
+[Directories]
+Include=C:\Program Files\PICC\Devices\;C:\Program Files\PICC\Drivers\
+[CRON.c]
+Type=4
+[mru-list]
+1=CRON.c
+[Opened Files]
+1=CRON.c
+2=
+[Units]
+Count=1
+1=CRON (main)

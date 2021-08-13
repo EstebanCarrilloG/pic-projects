@@ -1,0 +1,55 @@
+#include16f628a.h
+#fuses xt
+#fuses put
+#fuses nowdt
+#fuses noprotect
+#fuses nomclr
+
+#use delay(internal=4M)
+#use delay(clock= 4Mhz)
+#use standard_io(b)
+#use standard_io(a)
+int display[10]={0b0000001, 0b1001111, 0b0010010, 0b0000110, 0b1001100, 0b0100100, 0b0100000, 0b0001111, 0b000000, 0b0000100};
+
+void main() 
+
+{
+  int unidad = 0;
+  int decena = 0;
+  int tiempo = 5;
+  boolean estadoPrevio;
+  output_b(0b00000000);
+  
+  while (1)
+  {
+    output_a(0b10);
+    output_b(display[unidad]);
+    delay_ms(tiempo);
+    output_a(0b01);
+    output_b(display[decena]);
+    delay_ms(tiempo);
+    
+    if (input(pin_a2) != estadoPrevio ){
+      if (input(pin_a2)==1) {
+        unidad++; 
+      }
+    }
+
+    delay_ms(5);
+      
+      
+    if (unidad9){
+    decena++;
+    unidad=0;
+    }
+       
+    if(decena9){
+      decena=0;
+      unidad=0;
+    }
+      
+    estadoPrevio = input(pin_a2); 
+      
+   }
+   
+ }  

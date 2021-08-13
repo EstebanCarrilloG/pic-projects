@@ -1,0 +1,109 @@
+'****************************************************************
+'*  Name    : encXhoras.BAS                                    *
+'*  Author  : EDEPTEC                                           *
+'*  Notice  : Copyright (c) 2021 [select VIEW...EDITOR OPTIONS] *
+'*          : All Rights Reserved                               *
+'*  Date    : 10/02/2021                                        *
+'*  Version : 1.0                                               *
+'*  Notes   :                                                   *
+'*          :                                                   *
+'****************************************************************
+CMCON = 7
+trisa =%011'Declaramos los puertos a0 y a1 como entradas, y el puerto a2 como salida.
+porta = 0
+
+'Nombramos los puertos a0 y a1 como bt1 y bt2 respectivamente, haciendo referencia a los botones.
+bt1 VAR porta.0
+bt2 VAR porta.1
+'Nombramos el puerto a2 como led
+led VAR porta.2
+
+'CREAMOS VARIAS VARIABLES
+' Tres de tipo BYTE y dos de tipo WORD
+t VAR BYTE
+z VAR BYTE
+y VAR BYTE
+X VAR WORD
+tiempo var WORD
+
+y = 1' Le asignamos a la variable y el valor de 1
+
+' Declaramos pines de conexión del lcd
+
+DEFINE LCD_DREG PORTB 
+DEFINE LCD_DBIT 4  
+DEFINE LCD_RSREG PORTB 
+DEFINE LCD_RSBIT 2
+DEFINE LCD_EREG PORTB 
+DEFINE LCD_EBIT 3
+
+'Creamos un loop: CICLO
+CICLO:
+
+' Cada vez que presionemos el bt1:
+'* Sumaremos la variable t, esta variable ira de 0 a 24 
+'* Si la variable t es mayor a 24 entonces t = 0
+
+    IF BT1 = 1 THEN 
+        
+        PAUSE 500
+        t = t + 1
+        
+        IF T > 24 THEN
+            T = 0
+        ENDIF  
+  
+    ENDIF
+
+    
+    LCDOUT $fe, 1,$fe, 2, "PROGRAMAR TIEMPO"
+    LCDOUT $fe,$C5, DEC t' Imprimimos el valor de la variable t
+    LCDOUT $fe,$C8, "HORAS"
+    
+   
+    IF bt2 = 1 THEN ' Si pulsamos bt2, nos dirigimos al loop tiempoOn
+    
+        GOTO tiempoOn
+        
+    ENDIF
+
+
+PAUSE 50      
+ 
+GOTO CICLO' Cerramos el loop CICLO
+
+
+tiempoOn:
+   
+    tiempo = t * 60 ' *La variable tiempo tomara valores de 60 a 1440. 
+    
+    LCDOUT $fe, 1, $fe, 2, "TIME ON: ",DEC t, "Hr"' Imprimimos en el LCD el tiempo programado.   
+        LCDOUT $fe,$c0, "ELAPSED T: ",DEC z , "Hr" ' Imprimimos en el LCD el tiempo transcurrido. 
+    
+                                       
+    FOR X = 0 TO tiempo ' Creamos un ciclo for que ira de 0 hasta el valor de la variable tiempo, esta es la pausa durante la cual estará encendido el led
+    
+        HIGH led ' Activamos led 
+        PAUSE 60000 ' Establecemos una pausa de 1 minuto  
+        
+           IF x == y * 60 THEN ' Condición para mostrar en el LCD el tiempo transcurrido.
+       
+                y = y +  1
+                z =(x/60)
+                LCDOUT  $fe,$c0, "ELAPSED T: ",DEC z, "Hr" 
+         
+           ENDIF
+        
+    NEXT X 
+
+' Una vez que se haya terminado el ciclo for
+    
+    LOW LED ' Desactivamos led 
+    t = 0 ' Enceramos la variable t
+    LCDOUT $fe, 1 ' limpiamos el LCD
+    
+GOTO CICLO ' Retornamos al loop CICLO.
+
+
+
+

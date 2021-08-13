@@ -1,0 +1,23 @@
+'****************************************************************
+'*  Name    : UNTITLED.BAS                                      *
+'*  Author  : [select VIEW...EDITOR OPTIONS]                    *
+'*  Notice  : Copyright (c) 2017 [select VIEW...EDITOR OPTIONS] *
+'*          : All Rights Reserved                               *
+'*  Date    : 28/6/2017                                         *
+'*  Version : 1.0                                               *
+'*  Notes   :                                                   *
+'*          :                                                   *
+'****************************************************************
+
+trisb = 0
+
+semaforo:
+portb=%001100
+pause 5000
+portb=%001010
+pause 1000
+portb=%100001 
+pause 5000
+PORTB=%010001
+PAUSE 1000
+goto semaforo

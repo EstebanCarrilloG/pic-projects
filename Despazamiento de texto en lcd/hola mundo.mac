@@ -1,0 +1,118 @@
+
+	NOLIST
+; PICBASIC PRO(TM) Compiler 2.50, (c) 1998, 2007 microEngineering Labs, Inc. All Rights Reserved.  
+
+LABEL?L macro Label
+        RST?RP
+    ifdef PM_USED
+        LALL
+Label
+        XALL
+    else
+Label
+    endif
+    endm
+
+ADD?CBW macro Cin, Bin, Wout
+        movlw   low (Cin)
+        CHK?RP  Bin
+        addwf   Bin, W
+        MOVE?AB Wout
+    if (((Cin) >> 8) == 0)
+        clrf    Wout + 1
+        rlf     Wout + 1, F
+    else
+        movlw   (Cin) >> 8
+        btfsc   STATUS, C
+        addlw   1
+        movwf   Wout + 1
+    endif
+    endm
+
+SUB?BCB macro Bin, Cin, Bout
+    if ((Bout) == (Bin))
+      if ((Cin) == 1)
+        CHK?RP  Bout
+        decf    Bout, F
+      else
+        movlw   Cin
+        CHK?RP  Bout
+        subwf   Bout, F
+      endif
+    else
+      if ((Cin) == 1)
+        CHK?RP  Bin
+        decf    Bin, W
+      else
+        movlw   Cin
+        CHK?RP  Bin
+        subwf   Bin, W
+      endif
+        MOVE?AB Bout
+    endif
+    endm
+
+CMPGT?BCL macro Bin, Cin, Label
+    if ((Cin) < 0)
+        L?GOTO  Label
+    else
+      if ((Cin) < 0ffh)
+        CLRWDT?
+        MOVE?CA (Cin) + 1
+        CHK?RP  Bin
+        subwf   Bin, W
+        BIT?GOTO 1, STATUS, C, Label
+      endif
+    endif
+    endm
+
+GOTO?L macro Label
+        L?GOTO  Label
+    endm
+
+LCDOUT?C macro Cin
+        movlw   Cin
+        L?CALL  LCDOUT
+    endm
+LCDOUT_USED = 1
+
+LCDOUT?W macro Win
+        MOVE?WA Win
+        L?CALL  LCDOUT
+    endm
+LCDOUT_USED = 1
+
+NEXT?BCL macro Bin, Cin, Label
+    if ((Cin) == 1)
+        CHK?RP  Bin
+      if ((PREV_BANK == 0) & (CODE_SIZE <= 2))
+        incfsz  Bin, F
+        goto    Label
+      else
+        incf    Bin, F
+        BIT?GOTO 0, STATUS, Z, Label
+      endif
+    else
+        movlw   Cin
+        CHK?RP  Bin
+        addwf   Bin, F
+      if ((Cin) <= 255)
+        BIT?GOTO 0, STATUS, C, Label
+      endif
+    endif
+    endm
+
+PAUSE?C macro Cin
+    if (((Cin) >> 8) == 0)
+        MOVE?CA Cin
+        L?CALL  PAUSE
+    else
+        MOVE?CB (Cin) >> 8, R1 + 1
+        MOVE?CA low (Cin)
+        L?CALL  PAUSEL
+    endif
+    endm
+PAUSE_USED = 1
+
+
+	LIST

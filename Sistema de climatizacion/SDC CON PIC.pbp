@@ -1,0 +1,168 @@
+'****************************************************************
+'*  Name    : UNTITLED.BAS                                      *
+'*  Author  : EDEPTEC                                           *
+'*  Notice  : Copyright (c) 2021 www.edeptec.com                *
+'*          : All Rights Reserved                               *
+'*  Date    : 02/02/2021                                        *
+'*  Version : 1.0                                               *
+'*  Notes   :                                                   *
+'*          :                                                   *
+'****************************************************************
+
+;*---- Pines donde ira conectado el LCD ---*
+
+DEFINE LCD_DREG PORTB 
+DEFINE LCD_DBIT 0 
+DEFINE LCD_RSREG PORTB 
+DEFINE LCD_RSBIT 4 
+DEFINE LCD_EREG PORTB 
+DEFINE LCD_EBIT 5
+;*------------------------------------------*
+
+;-----------Parametros conversor Analogico/Digital--------------*
+DEFINE ADC_BITS 10 ;Fijar número de BITS del resultado (5,8,10)
+DEFINE ADC_CLOCK 3 ;Fijar EL CLOCK (rc = 3)
+DEFINE ADC_SAMPLEUS 50 ;Fijar el tiempo de muestreo en Us
+;ADC_SAMPLEUS es el número de microsegundos que el programa espera
+;entre fijar el canal y comenzar la conversión analogica/digital.
+;*--------------------------------------------------------------*
+TRISA =%1 ;el puerto A.0 es de entrada
+ADCON1 = %00001110 ;el puerto A.0 es conversor los demás son Digitales  
+TRISD = %11100000
+
+dato VAR WORD ;crear variable dato para guardar el valor de la temperatura actual
+tempMin VAR BYTE; Variable para almacenar la temperatura minima programada
+tempMax VAR BYTE; Variable para almacenar la temperatura maxima programada
+x VAR BYTE; Variable para hacer una pausa con un ciclo for
+g CON 223 ;g constante 223. Este es el ASCII de grados
+calf VAR portD.3 ;nombres para los pines
+vent VAR portD.4
+enter VAR portD.5
+botonBajar VAR portD.6
+botonSubir VAR portD.7
+
+EEPROM 0,[18,25] ;contenido inicial de la EEPROM. Temperatura inicial que se muestra en el LCD
+
+inicio:
+READ 0,tempMIN ;lee direccion 0 de la memoria EEPROM y lo guarda en tempMin
+READ 1,tempMAX ;lee direccion 1 de la memoria EEPROM y lo guarda en tempMax
+
+sensar:
+    
+    ADCIN 0, dato ;leer el canal 0 (A0) y guarde en dato
+    LCDOUT $fe, 1,$fe, 2, "T.MIN T.ACT T.MAX" ;limpiar LCD y sacar texto
+    dato = dato /128 ; el dato dividir para 128= C/AD de 9 bits
+    LCDOUT $fe,$c6,DEC dato,g,"C" ;Display el decimal de dato(Temp Actual)
+    LCDOUT $fe,$c0,DEC tempMin,g,"C" ;Display el decimal de tempMin
+    LCDOUT $fe,$cc,DEC tempMax,g,"C" ;Display el decimal de tempMax
+
+    FOR X = 0 TO 100 ;Pausa: Esta pausa es para evitar cambios bruscos de la Temp Actual
+        IF enter =1 THEN grabar1a
+            PAUSE 15
+    NEXT
+
+
+    IF dato < tempmin THEN calentar ;si dato es<tempMin ir a calentar
+    IF dato > tempMAX THEN enfriar ;si dato es>tempMax ir a enfiriar
+    
+    LOW calf : LOW vent ;apagamos calefactor y ventilador
+
+GOTO sensar ;continuar sensando
+
+calentar:
+    HIGH calf : LOW vent; Encendemos el calefactor
+GOTO sensar
+
+enfriar:
+    HIGH vent : LOW calf; Encendemos el ventilador
+GOTO sensar
+
+grabar1a:
+
+GOSUB soltar; ;programa antirrebote de tecla
+
+grabar1:
+
+; Aqui vamos a programar la temperatura Minima
+
+    LCDOUT $fe, 1, $fe, 2, "PROGRAMAR TEMP:"
+    LCDOUT $fe,$c0,"Minima = ",DEC tempMIN ,g,"C"
+    PAUSE 100
+    
+        IF bOTONbajar=1 THEN restar1; Si presionamos el pulsador (-) nos vamos a restar
+        IF bOTONsubir=1 THEN sumar1; Si presionamos el pulsador (+) nos vamos a sumar
+        IF enter=1 THEN grabarA
+    
+GOTO grabar1
+
+restar1:
+
+    GOSUB soltar ;programa antirrebote de tecla
+    IF tempMIN < 9 THEN grabar1 ; Limite minimo para la temperatura minima
+    tempMIN= tempMIN -1 ; Restamos el valor de temMin
+    
+    GOTO grabar1
+     
+sumar1:
+
+    GOSUB soltar
+    IF tempMIN > 18 THEN grabar1 ; Limite maximo para la temperatura minima
+    tempMIN= tempMIN + 1 ; Sumamos el valor de temMin
+    
+GOTO grabar1
+
+grabarA:
+
+    GOSUB soltar
+    ; Grabamos el valor de la temperatura minima programada en la memoria EEPROM
+    WRITE 0,tempMIN ;escribir en la dirección 0 de la EEPROM
+
+grabar2: 
+
+; Aqui vamos a programar la temperatura Minima
+
+    LCDOUT $fe, 1, $fe, 2, "PROGRAMAR TEMP:"
+    LCDOUT $fe,$c0,"Maxima = ",dec tempMAX ,g,"C"
+    PAUSE 100
+    
+        IF bOTONbajar=1 THEN restar2
+        IF bOTONsubir=1 THEN sumar2
+        IF enter=1 THEN grabarB
+        
+GOTO grabar2
+
+restar2:
+
+    GOSUB soltar
+    IF tempMAX < 24 THEN grabar2 ; Limite minimo para la temperatura maxima
+    tempMAX= tempMAX -1
+    
+GOTO grabar2
+
+sumar2:
+
+    GOSUB soltar
+    IF tempMAX > 40 THEN grabar2 ; Limite maximo para la temperatura maxima
+    tempMAX= tempMAX + 1
+    
+GOTO grabar2
+
+grabarB:
+
+    GOSUB soltar
+    ; Grabamos el valor de la temperatura minima programada en la memoria EEPROM
+    WRITE 1,tempMAX;escribir en la dirección 1 de la EEPROM
+    
+GOTO inicio
+
+soltar: ;programa antirrebote de tecla
+
+soltar2:
+
+    IF bOTONbajar=1 THEN soltar2
+    IF bOTONsubir=1 THEN soltar2
+    IF enter=1THEN soltar2
+    PAUSE 100
+    
+RETURN
+

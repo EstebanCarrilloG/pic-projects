@@ -1,0 +1,81 @@
+'****************************************************************
+'*  Name    : UNTITLED.BAS                                      *
+'*  Author  : [select VIEW...EDITOR OPTIONS]                    *
+'*  Notice  : Copyright (c) 2020 [select VIEW...EDITOR OPTIONS] *
+'*          : All Rights Reserved                               *
+'*  Date    : 17/12/2020                                        *
+'*  Version : 1.0                                               *
+'*  Notes   :                                                   *
+'*          :                                                   *
+'****************************************************************
+X VAR BYTE   
+
+X1 VAR BYTE    
+
+; Definimos en que pines del pic ira conectado el lcd   
+
+DEFINE LCD_DREG PORTB 
+
+DEFINE LCD_DBIT 4   
+
+DEFINE LCD_RSREG PORTB 
+
+DEFINE LCD_RSBIT 2 
+
+DEFINE LCD_EREG PORTB 
+
+DEFINE LCD_EBIT 3 
+
+  
+
+; Abrimos un ciclo.                                   
+
+ciclo: 
+
+; Creamos un cilo for que ira de 0 a 6. 
+
+; Si queremos que todo el texto desaparezca del lcd cuando el desplazamiento es hacia la izquierda deberemos cambiar el valor a 16 
+
+; El ciclo for se va a repetir 6 veces, en cada una de estas repeticiones el texto se ira desplazando un espacio a la vez. 
+
+FOR X = 0 TO  6 
+
+  
+
+LCDOUT $FE, 1 ; limpia la pantalla y coloca el cursor al comienzo 
+
+; Aquí es donde realizamos el desplazamiento del texto hacia la izquierda. 
+
+LCDOUT $FE, $80 + X, "Hola Mundo"; El valor de X cambia el valor de $80 por ejemplo si x = 5; $84  
+
+LCDOUT $FE, $C0 + X, "1234567890"; El valor de X cambia el valor de $C0 por ejemplo si x = 5; $C4  
+
+PAUSE 100                               
+
+NEXT 
+
+; Aquí es donde realizamos el desplazamiento del texto hacia la izquierda. 
+
+; Creamos otro ciclo for pero con otra variable. 
+
+FOR X1 = 0 TO 5 
+
+; En este momento el valor de x = 6. Entonces, para que el texto se desplace hacia la izquierda tenemos que restar esa variable. 
+
+x = x - 1 
+
+  
+
+LCDOUT $FE, 1; limpia la pantalla y coloca el cursor al comienzo 
+
+LCDOUT $FE, $80 + X, "Hola Mundo"; El valor de X cambia el valor de $80 por ejemplo si x = 5; $84  
+
+LCDOUT $FE, $C0 + X, "1234567890"; El valor de X cambia el valor de $C0 por ejemplo si x = 5; $C4 
+
+PAUSE 100                               
+
+NEXT 
+
+; Cerramos el ciclo 
+
+GOTO ciclo: 

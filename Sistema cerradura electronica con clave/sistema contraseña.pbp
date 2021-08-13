@@ -1,0 +1,126 @@
+''****************************************************************
+'*  Name    : UNTITLED.BAS                                      *
+'*  Author  : [select VIEW...EDITOR OPTIONS]                    *
+'*  Notice  : Copyright (c) 2020 [select VIEW...EDITOR OPTIONS] *
+'*          : All Rights Reserved                               *
+'*  Date    : 14/12/2020                                        *
+'*  Version : 1.0                                               *
+'*  Notes   :                                                   *
+'*          :                                                   *
+'****************************************************************
+
+
+define LCD_DREG PORTC
+DEFINE LCD_DBIT 4
+DEFINE LCD_RSREG PORTC
+DEFINE LCD_RSBIT 1
+DEFINE LCD_EREG PORTC
+DEFINE LCD_EBIT 2
+
+trisb=%0001111
+
+c0 var portd.6
+c1 var portd.5 
+c2 var portd.4 
+
+f0 var PORTd.3
+f1 var portd.2 
+f2 var portd.1
+f3 var portd.0 
+
+
+
+x var byte
+n var byte
+pausa var byte
+
+pausa = 10
+
+
+
+
+                
+lcdout $FE,2, "TECLAS PULSADAS:"
+
+ciclo:
+
+    high c0
+    low c1
+    low c2
+    
+        if f0 = 1 tHEN 
+            x = 3:gosub almacenarnumeros:endif
+        if f1 = 1 tHEN 
+            x = 6:gosub almacenarnumeros:endif
+        if f2 = 1 tHEN 
+            x = 9:gosub almacenarnumeros:endif
+        if f3 = 1 tHEN 
+            x = "#":gosub almacenarnumeros:endif
+        
+            
+    low c0
+    pause pausa           
+    low c0
+    high c1
+    low c2 
+    
+        if f0 = 1 tHEN
+            x = 2:gosub almacenarnumeros:endif
+        if f1 = 1 tHEN
+            x = 5:gosub almacenarnumeros:endif
+        if f2 = 1 tHEN
+            x = 8:gosub almacenarnumeros:endif
+        if f3 = 1 tHEN
+            x = 0:gosub almacenarnumeros:endif
+
+    low c1
+    pause pausa
+    low c0
+    low c1
+    high c2
+    
+        if f0 = 1 tHEN
+            x = 1:gosub almacenarnumeros:endif
+        if f1 = 1 tHEN
+            x = 4:gosub almacenarnumeros:endif
+        if f2 = 1 tHEN
+            x = 7:gosub almacenarnumeros:endif
+        if f3 = 1 tHEN
+            x = "*":gosub almacenarnumeros:endif
+            
+    low c2
+    pause pausa
+    
+goto ciclo
+
+almacenarnumeros:
+
+    
+
+    lcdout $FE,2, "TECLAS PULSADAS:"
+    lcdout $FE,$C0 + n
+    
+    IF x = "*" then
+        lcdout "*"
+    ELSE
+     if x =  "#" then
+        lcdout "#"
+    ELSE  
+        lcdout DEC x
+    ENDIF
+    ENDIF
+    PAUSE 50
+    n = n + 1
+    
+    if n >= 16 then 
+    lcdout $FE,1
+    n = 0
+    lcdout $FE,2, "TECLAS PULSADAS:"
+    endif
+    
+    
+    
+    
+return
+
+
