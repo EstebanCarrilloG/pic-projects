@@ -1,7 +1,7 @@
 '****************************************************************
-'*  Name    : encXhoras.BAS                                    *
-'*  Author  : EDEPTEC                                           *
-'*  Notice  : Copyright (c) 2021 [select VIEW...EDITOR OPTIONS] *
+'*  Name    : encXhoras.BAS                                     *
+'*  Author  : Esteban Carrillo - www.edeptec.com                *
+'*  Notice  : Copyright (c) 2022                                *
 '*          : All Rights Reserved                               *
 '*  Date    : 10/02/2021                                        *
 '*  Version : 1.0                                               *
@@ -28,7 +28,7 @@ tiempo var WORD
 
 y = 1' Le asignamos a la variable y el valor de 1
 
-' Declaramos pines de conexiÛn del lcd
+' Declaramos pines de conexi√≥n del lcd
 
 DEFINE LCD_DREG PORTB 
 DEFINE LCD_DBIT 4  
@@ -81,12 +81,12 @@ tiempoOn:
         LCDOUT $fe,$c0, "ELAPSED T: ",DEC z , "Hr" ' Imprimimos en el LCD el tiempo transcurrido. 
     
                                        
-    FOR X = 0 TO tiempo ' Creamos un ciclo for que ira de 0 hasta el valor de la variable tiempo, esta es la pausa durante la cual estar· encendido el led
+    FOR X = 0 TO tiempo ' Creamos un ciclo for que ira de 0 hasta el valor de la variable tiempo, esta es la pausa durante la cual estar√° encendido el led
     
         HIGH led ' Activamos led 
         PAUSE 60000 ' Establecemos una pausa de 1 minuto  
         
-           IF x == y * 60 THEN ' CondiciÛn para mostrar en el LCD el tiempo transcurrido.
+           IF x == y * 60 THEN ' Condici√≥n para mostrar en el LCD el tiempo transcurrido.
        
                 y = y +  1
                 z =(x/60)
