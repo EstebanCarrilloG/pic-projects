@@ -1,7 +1,7 @@
 '****************************************************************
 '*  Name    : UNTITLED.BAS                                      *
-'*  Author  : [select VIEW...EDITOR OPTIONS]                    *
-'*  Notice  : Copyright (c) 2021 [select VIEW...EDITOR OPTIONS] *
+'*  Author  : Esteban Carrillo - www.edeptec.com                *
+'*  Notice  : Copyright (c) 2022                                *
 '*          : All Rights Reserved                               *
 '*  Date    : 21/01/2021                                        *
 '*  Version : 1.0                                               *
@@ -22,23 +22,23 @@ define LCD_EBIT 1
 
 DEFINE I2C_SCLOUT 1 ;para que no necesite resistencia pull-up en SCL
 
-CPIN VAR Portb.7 ;pin señal de reloj I2C
+CPIN VAR Portb.7 ;pin seÃ±al de reloj I2C
 DPIN VAR Portb.6 ;pin de datos I2C
-segu VAR BYTE ;definir tamaño de variable segundos 1 a 255
+segu VAR BYTE ;definir tamaÃ±o de variable segundos 1 a 255
 minu VAR BYTE ;variable para los minutos
 hora VAR BYTE ;variable para las horas
-diaS VAR BYTE ;variable día de la semana
-diaF VAR BYTE ;variable día fecha del mes
+diaS VAR BYTE ;variable dÃ­a de la semana
+diaF VAR BYTE ;variable dÃ­a fecha del mes
 mes VAR BYTE ;variable mes
-anio VAR BYTE ;variable año de 2 dígitos
+anio VAR BYTE ;variable aÃ±o de 2 dÃ­gitos
 actualizado VAR BIT ;variable para almacenar un 1 o 0
 ;EEPROM 0,[0] ;memoria 0 con el valor inicial 0, sirve para
 
  
  ;indicar que nunca ha corrido este programa
-;READ 0,actualizado ;carga el valor de la memoria EEPROM dirección 0
+;READ 0,actualizado ;carga el valor de la memoria EEPROM direcciÃ³n 0
 ;IF actualizado =0 THEN grabarRTC ;si es la 1ra vez que corre ir a grabar RTC
- ;caso contrario sólo leer el RTC
+ ;caso contrario sÃ³lo leer el RTC
  
 
 INICIO:
@@ -53,7 +53,7 @@ INICIO:
  I2CREAD DPIN,CPIN,%11010000,6,[anio]
 
      LCDOUT $fe,1 , $fe,2
-     ;mostrar día de la semana
+     ;mostrar dÃ­a de la semana
      IF diaS=$1 THEN LCDOUT "Dom."
      IF diaS=$2 THEN LCDOUT "Lun."
      IF diaS=$3 THEN LCDOUT "Mar."
@@ -62,7 +62,7 @@ INICIO:
      IF diaS=$6 THEN LCDOUT "Vie."
      IF diaS=$7 THEN LCDOUT "Sab."
      
-     lcdout hex2 diaf ;mostrar día del mes
+     lcdout hex2 diaf ;mostrar dÃ­a del mes
      lcdout "/"
      ;mostrar el mes
      IF mes=$1 THEN LCDOUT "ene" 
@@ -79,9 +79,9 @@ INICIO:
      IF mes=$12 THEN LCDOUT "dic"
      
      lcdout "/20"
-     lcdout hex2 anio ; mostrar año /20 + 21
+     lcdout hex2 anio ; mostrar aÃ±o /20 + 21
      LCDOUT $fe,$c0,HEX2 hora,":", HEX2 minu,":", HEX2 segu ;mostrar la hora
-     ; min y segs. en 2 dígitos (HEX2)
+     ; min y segs. en 2 dÃ­gitos (HEX2)
     
      PAUSE 500 
      
@@ -98,18 +98,18 @@ grabarRTC:
 
 
 I2CWRITE DPIN,CPIN,%11010000,0,[$00] ;setear 00 segundos
- PAUSE 10 ;retardo para finalizar grabación
+ PAUSE 10 ;retardo para finalizar grabaciÃ³n
 I2CWRITE DPIN,CPIN,%11010000,1,[$32] ;setear 32 minutos
  PAUSE 10
 I2CWRITE DPIN,CPIN,%11010000,2,[$15] ;setear las 15 horas
  PAUSE 10
-I2CWRITE DPIN,CPIN,%11010000,3,[$5] ;setear día jueves, D=1,L=2
+I2CWRITE DPIN,CPIN,%11010000,3,[$5] ;setear dÃ­a jueves, D=1,L=2
  PAUSE 10 ;M=3, M=4, J=5, V=6, S=7
-I2CWRITE DPIN,CPIN,%11010000,4,[$21] ;setear día 21 del mes
+I2CWRITE DPIN,CPIN,%11010000,4,[$21] ;setear dÃ­a 21 del mes
  PAUSE 10
 I2CWRITE DPIN,CPIN,%11010000,5,[$1] ;setear mes enero
  PAUSE 10
-I2CWRITE DPIN,CPIN,%11010000,6,[$21] ;setear año 21
+I2CWRITE DPIN,CPIN,%11010000,6,[$21] ;setear aÃ±o 21
  PAUSE 10
 WRITE 0,1 ;escribe en la memoria 0 el valor de 1 para que no
  ;se vuelva a grabar otra vez estos datos en el RTC
