@@ -1,9 +1,9 @@
 '****************************************************************
 '*  Name    : UNTITLED.BAS                                      *
-'*  Author  : [select VIEW...EDITOR OPTIONS]                    *
+'*  Author  : Esteban Carrillo - www.edeptec.com                *
 '*  Notice  : Copyright (c) 2020 [select VIEW...EDITOR OPTIONS] *
 '*          : All Rights Reserved                               *
-'*  Date    : 17/12/2020                                        *
+'*  Date    : 17/12/2022                                        *
 '*  Version : 1.0                                               *
 '*  Notes   :                                                   *
 '*          :                                                   *
@@ -44,7 +44,7 @@ FOR X = 0 TO  6
 
 LCDOUT $FE, 1 ; limpia la pantalla y coloca el cursor al comienzo 
 
-; Aquí es donde realizamos el desplazamiento del texto hacia la izquierda. 
+; AquÃ­ es donde realizamos el desplazamiento del texto hacia la izquierda. 
 
 LCDOUT $FE, $80 + X, "Hola Mundo"; El valor de X cambia el valor de $80 por ejemplo si x = 5; $84  
 
@@ -54,7 +54,7 @@ PAUSE 100
 
 NEXT 
 
-; Aquí es donde realizamos el desplazamiento del texto hacia la izquierda. 
+; AquÃ­ es donde realizamos el desplazamiento del texto hacia la izquierda. 
 
 ; Creamos otro ciclo for pero con otra variable. 
 
