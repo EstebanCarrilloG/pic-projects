@@ -12,19 +12,19 @@ CMCON = 7
 trisa =%011'Declaramos los puertos a0 y a1 como entradas, y el puerto a2 como salida.
 porta = 0
 
-'Nombramos los puertos a0 y a1 como bt1 y bt2 respectivamente, haciendo referencia a los botones.
-bt1 VAR porta.0
-bt2 VAR porta.1
+'Nombramos los puertos a0 y a1 como pulsadorSumar y pulsadorIniciar respectivamente, haciendo referencia a los botones.
+pulsadorSumar VAR porta.0
+pulsadorIniciar VAR porta.1
 'Nombramos el puerto a2 como led
 led VAR porta.2
 
 'CREAMOS VARIAS VARIABLES
 ' Tres de tipo BYTE y dos de tipo WORD
-t VAR BYTE
-z VAR BYTE
+tiempoProgramado VAR BYTE
+tiempoTranscurrido VAR BYTE
 y VAR BYTE
-X VAR WORD
-tiempo var WORD
+tiempoActual VAR WORD
+tiempoLimite var WORD
 
 y = 1' Le asignamos a la variable y el valor de 1
 
@@ -37,72 +37,63 @@ DEFINE LCD_RSBIT 2
 DEFINE LCD_EREG PORTB 
 DEFINE LCD_EBIT 3
 
-'Creamos un loop: CICLO
-CICLO:
+'Creamos un loop: cicloProgramarTiempo
+cicloProgramarTiempo:
 
-' Cada vez que presionemos el bt1:
-'* Sumaremos la variable t, esta variable ira de 0 a 24 
-'* Si la variable t es mayor a 24 entonces t = 0
+' Cada vez que presionemos el pulsadorSumar:
+'* Sumaremos la variable tiempoProgramado, esta variable ira de 0 a 24 
+'* Si la variable tiempoProgramado es mayor a 24 entonces tiempoProgramado = 0
 
-    IF BT1 = 1 THEN 
-        
+    IF pulsadorSumar = 1 THEN 
         PAUSE 500
-        t = t + 1
+        tiempoProgramado = tiempoProgramado + 1
         
-        IF T > 24 THEN
-            T = 0
+        IF tiempoProgramado > 24 THEN
+            tiempoProgramado = 0
         ENDIF  
-  
     ENDIF
 
     
     LCDOUT $fe, 1,$fe, 2, "PROGRAMAR TIEMPO"
-    LCDOUT $fe,$C5, DEC t' Imprimimos el valor de la variable t
+    LCDOUT $fe,$C5, DEC tiempoProgramado  'Imprimimos el valor de la variable tiempoProgramado
     LCDOUT $fe,$C8, "HORAS"
     
    
-    IF bt2 = 1 THEN ' Si pulsamos bt2, nos dirigimos al loop tiempoOn
-    
-        GOTO tiempoOn
-        
+    IF pulsadorIniciar = 1 THEN ' Si pulsamos pulsadorIniciar, nos dirigimos al loop tiempoOn
+        GOTO iniciarTemporizador     
     ENDIF
 
 
 PAUSE 50      
  
-GOTO CICLO' Cerramos el loop CICLO
+GOTO cicloProgramarTiempo' Cerramos el loop cicloProgramarTiempo
 
-
-tiempoOn:
+iniciarTemporizador:
    
-    tiempo = t * 60 ' *La variable tiempo tomara valores de 60 a 1440. 
+    tiempoLimite = tiempoProgramado * 60 ' *La variable tiempoLimite tomara valores de 60 a 1440. 
     
-    LCDOUT $fe, 1, $fe, 2, "TIME ON: ",DEC t, "Hr"' Imprimimos en el LCD el tiempo programado.   
-        LCDOUT $fe,$c0, "ELAPSED T: ",DEC z , "Hr" ' Imprimimos en el LCD el tiempo transcurrido. 
-    
-                                       
-    FOR X = 0 TO tiempo ' Creamos un ciclo for que ira de 0 hasta el valor de la variable tiempo, esta es la pausa durante la cual estará encendido el led
+    LCDOUT $fe, 1, $fe, 2, "TIME ON: ",DEC tiempoProgramado, "Hr"' Imprimimos en el LCD el tiempo programado.   
+    LCDOUT $fe,$c0, "ELAPSED T: ",DEC tiempoTranscurrido , "Hr" ' Imprimimos en el LCD el tiempo transcurrido. 
+                             
+    FOR tiempoActual = 0 TO tiempoLimite ' Creamos un ciclo for que ira de 0 hasta el valor de la variable tiempoLimite, esta es la pausa durante la cual estará encendido el led
     
         HIGH led ' Activamos led 
         PAUSE 60000 ' Establecemos una pausa de 1 minuto  
         
-           IF x == y * 60 THEN ' Condición para mostrar en el LCD el tiempo transcurrido.
-       
-                y = y +  1
-                z =(x/60)
-                LCDOUT  $fe,$c0, "ELAPSED T: ",DEC z, "Hr" 
-         
-           ENDIF
-        
-    NEXT X 
+        IF tiempoActual == y * 60 THEN ' Condición para mostrar en el LCD el tiempoLimite transcurrido.
+            y = y +  1
+            tiempoTranscurrido =(tiempoActual/60)
+            LCDOUT  $fe,$c0, "ELAPSED tiempoProgramado: ",DEC tiempoTranscurrido, "Hr" 
+        ENDIF 
+    NEXT tiempoActual 
 
 ' Una vez que se haya terminado el ciclo for
     
     LOW LED ' Desactivamos led 
-    t = 0 ' Enceramos la variable t
+    tiempoProgramado = 0 ' Enceramos la variable tiempoProgramado
     LCDOUT $fe, 1 ' limpiamos el LCD
     
-GOTO CICLO ' Retornamos al loop CICLO.
+GOTO cicloProgramarTiempo ' Retornamos al loop cicloProgramarTiempo.
 
 
 
