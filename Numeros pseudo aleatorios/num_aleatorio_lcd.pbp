@@ -1,7 +1,7 @@
 '****************************************************************
 '*  Name    : UNTITLED.BAS                                      *
-'*  Author  : Esteban Carrillo - www.edeptec.com                    *
-'*  Notice  : Copyright (c) 2022 *
+'*  Author  : Esteban Carrillo - www.edeptec.com                *
+'*  Notice  : Copyright (c) 2022                                *    
 '*          : All Rights Reserved                               *
 '*  Date    : 18/03/2021                                        *
 '*  Version : 1.0                                               *
@@ -15,25 +15,16 @@ DEFINE LCD_RSBIT 4
 DEFINE LCD_EREG PORTB 
 DEFINE LCD_EBIT 5
 
-X VAR BYTE
-Y VAR BYTE
-N VAR BYTE
+x VAR BYTE
+y VAR BYTE
+n VAR BYTE
 
-
-Y = 5
-
-CICLO:
-
- 
-   
-   
-    X = (((7*X)+5) Mod 99)
-    N = X Mod 50
- 
+y = 5
+CICLO: 
+    x = (((7*x)+5) Mod 99)
+    n = x Mod 50
 
     LCDOUT $fe, 1
-    LCDOUT $fe, $80 + Y, "Num:" ,DEC n
+    LCDOUT $fe, $80 + y, "Num:" ,DEC n
     PAUSE 500
-
-
 GOTO CICLO
