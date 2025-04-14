@@ -1,3 +1,11 @@
+/* 
+
+* Código escrito por: Esteban Carrillo para EDEPTEC. 
+* Página web: https://www.edeptec.com
+* Facebook: @edeptec
+* Youtube: https://youtube.com/c/EDEPTEC
+
+*/
 #include <16F877a.h>
 #fuses XT,NOWDT,NOPROTECT,NOLVP
 #use delay(clock = 4M)
@@ -15,9 +23,8 @@ void ext_isr(void){
    
    if(pause==0)
       pause=1;
-   ELSE
+   else
       pause=0;
-      
 }
 
 void main (){
