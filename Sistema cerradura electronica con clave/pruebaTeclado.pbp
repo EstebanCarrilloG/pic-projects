@@ -1,0 +1,118 @@
+''****************************************************************
+'*  Name    : UNTITLED.BAS                                      *
+'*  Author  : [select VIEW...EDITOR OPTIONS]                    *
+'*  Notice  : Copyright (c) 2020 [select VIEW...EDITOR OPTIONS] *
+'*          : All Rights Reserved                               *
+'*  Date    : 14/12/2020                                        *
+'*  Version : 1.0                                               *
+'*  Notes   :                                                   *
+'*          :                                                   *
+'****************************************************************
+
+
+'Conexiones LCD
+define LCD_DREG PORTC
+DEFINE LCD_DBIT 4
+DEFINE LCD_RSREG PORTC
+DEFINE LCD_RSBIT 1
+DEFINE LCD_EREG PORTC
+DEFINE LCD_EBIT 2
+
+trisb=%00001111
+
+'Conexiones keypad
+
+columna0 var portd.4
+columna1 var portd.5 
+columna2 var portd.6 
+
+fila0 var PORTd.3
+fila1 var portd.2 
+fila2 var portd.1
+fila3 var portd.0 
+
+tecla var byte 'Almacena el valor de la tecla pulsada
+n var byte 
+pausa var byte 'Pausa para el multiplexado
+
+pausa = 10
+          
+lcdout $FE,2, "TECLAS PULSADAS:"
+
+ciclo:
+
+    high columna0
+    low columna1
+    low columna2
+    
+        if fila0 = 1 tHEN 
+            tecla = 3:gosub imprimirValorDeTecla:endif
+        if fila1 = 1 tHEN 
+            tecla = 6:gosub imprimirValorDeTecla:endif
+        if fila2 = 1 tHEN 
+            tecla = 9:gosub imprimirValorDeTecla:endif
+        if fila3 = 1 tHEN 
+            tecla = "#":gosub imprimirValorDeTecla:endif
+        
+            
+    low columna0
+    pause pausa           
+    low columna0
+    high columna1
+    low columna2 
+    
+        if fila0 = 1 tHEN
+            tecla = 2:gosub imprimirValorDeTecla:endif
+        if fila1 = 1 tHEN
+            tecla = 5:gosub imprimirValorDeTecla:endif
+        if fila2 = 1 tHEN
+            tecla = 8:gosub imprimirValorDeTecla:endif
+        if fila3 = 1 tHEN
+            tecla = 0:gosub imprimirValorDeTecla:endif
+
+    low columna1
+    pause pausa
+    low columna0
+    low columna1
+    high columna2
+    
+        if fila0 = 1 tHEN
+            tecla = 1:gosub imprimirValorDeTecla:endif
+        if fila1 = 1 tHEN
+            tecla = 4:gosub imprimirValorDeTecla:endif
+        if fila2 = 1 tHEN
+            tecla = 7:gosub imprimirValorDeTecla:endif
+        if fila3 = 1 tHEN
+            tecla = "*":gosub imprimirValorDeTecla:endif
+            
+    low columna2
+    pause pausa
+    
+goto ciclo
+
+imprimirValorDeTecla:
+
+    lcdout $FE,2, "TECLAS PULSADAS:"
+    lcdout $FE,$C0 + n
+    
+    IF tecla = "*" then
+        lcdout "*"
+    ELSE
+     if tecla =  "#" then
+        lcdout "#"
+    ELSE  
+        lcdout DEC tecla
+    ENDIF
+    ENDIF
+    PAUSE 50
+    n = n + 1
+    
+    if n >= 16 then 
+    lcdout $FE,1
+    n = 0
+    lcdout $FE,2, "TECLAS PULSADAS:"
+    endif
+
+return
+
+

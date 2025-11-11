@@ -1,0 +1,146 @@
+''***************************************************************
+'*  Name    : UNTITLED.BAS                                      *
+'*  Author  : Esteban Carrillo                                  *
+'*  Notice  : Copyright (c) 2025                                *
+'*          : All Rights Reserved                               *
+'*  Date    : 11/11/2025                                        *
+'*  Version : 1.1                                               *
+'*  Notes   :                                                   *
+'*          :                                                   *
+'****************************************************************
+
+'Conexiones LCD
+define LCD_DREG PORTC
+DEFINE LCD_DBIT 4
+DEFINE LCD_RSREG PORTC
+DEFINE LCD_RSBIT 1
+DEFINE LCD_EREG PORTC
+DEFINE LCD_EBIT 2
+
+trisb=%00001111
+
+'Conexiones keypad
+
+columna0 var portd.4
+columna1 var portd.5 
+columna2 var portd.6 
+
+fila0 var PORTd.3
+fila1 var portd.2 
+fila2 var portd.1
+fila3 var portd.0 
+
+'Conexión led
+Led var portd.7
+
+tecla var byte 'Almacena el valor de la tecla pulsada
+n var byte 
+pausa var byte 'Pausa para el multiplexado
+
+pausa = 200
+
+clave var BYTE[5] 'Almacena la clave
+valorTeclaPusada var BYTE[5] 'Almacena los valores de las teclas pulsadas
+
+'Clave de 5 dígitos
+clave[0] = "*"
+clave[1] = 2
+clave[2] = 7
+clave[3] = "#"
+clave[4] = 6
+
+
+'Multiplexacion para controlar el teclado                
+manejarTeclado:
+
+    lcdout $FE,2, "    <CLAVE>     "
+
+    high columna0
+    low columna1
+    low columna2
+    
+        if fila0 = 1 tHEN 
+            tecla = 3:gosub almacenarDigitos:endif
+        if fila1 = 1 tHEN 
+            tecla = 6:gosub almacenarDigitos:endif
+        if fila2 = 1 tHEN 
+            tecla = 9:gosub almacenarDigitos:endif
+        if fila3 = 1 tHEN 
+            tecla = "#":gosub almacenarDigitos:endif
+            
+            
+    low columna0
+    pause pausa           
+    low columna0
+    high columna1
+    low columna2 
+    
+        if fila0 = 1 tHEN
+            tecla = 2:gosub almacenarDigitos:endif
+        if fila1 = 1 tHEN
+            tecla = 5:gosub almacenarDigitos:endif
+        if fila2 = 1 tHEN
+            tecla = 8:gosub almacenarDigitos:endif
+        if fila3 = 1 tHEN
+            tecla = 0:gosub almacenarDigitos:endif
+
+    low columna1
+    pause pausa
+    low columna0
+    low columna1
+    high columna2
+    
+        if fila0 = 1 tHEN
+            tecla = 1:gosub almacenarDigitos:endif
+        if fila1 = 1 tHEN
+            tecla = 4:gosub almacenarDigitos:endif
+        if fila2 = 1 tHEN
+            tecla = 7:gosub almacenarDigitos:endif
+        if fila3 = 1 tHEN
+            tecla = "*":gosub almacenarDigitos:endif
+            
+    low columna2
+    pause pausa
+    
+goto manejarTeclado                   
+
+almacenarDigitos:
+
+    lcdout $FE,$C5 + n 'moverse una posicion en el LCD hacia la derecha
+    lcdout "*" 'mostrar * en el LCD
+
+    'Almacenar el valor de la tecla pulsada en un indice del array: valorTeclaPusada
+    valorTeclaPusada[N] = tecla 
+    
+    PAUSE 50
+    
+    n = n + 1
+    
+    
+    if n = 5 then 'Longitud de la clave
+       GOSUB comprovarClaves   
+    endif
+    
+return
+
+
+comprovarClaves:
+    'Verificar si las claves coinciden
+    IF valorTeclaPusada[0] = Clave[0] AND valorTeclaPusada[1] = Clave[1] AND valorTeclaPusada[2] = Clave[2] AND valorTeclaPusada[3] = Clave[3] AND valorTeclaPusada[4] = Clave[4] THEN
+            
+       lcdout $FE,1, $FE,2, "CLAVE CORRECTA"
+       high led 'Encender led por 5 segundos
+       PAUSE 5000
+       low led 'Apagar led
+       N = 0
+            
+    ELSE
+            
+        lcdout $FE,1, $FE,2, "CLAVE INCORRECTA"
+        PAUSE 5000
+        n = 0     
+        lcdout $FE,1
+            
+    ENDIF
+
+RETURN
