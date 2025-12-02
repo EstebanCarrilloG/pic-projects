@@ -1,26 +1,31 @@
 '****************************************************************
 '*  Name    : UNTITLED.BAS                                      *
 '*  Author  : Esteban Carrillo                                  *
-'*  Notice  : Copyright (c) 2020                                *
+'*  Notice  : Copyright (c) 2025                                *
 '*          : All Rights Reserved                               *
-'*  Date    : 13/12/2020                                        *
+'*  Date    : 13/12/2025                                        *
 '*  Version : 1.0                                               *
 '*  Notes   :                                                   *
 '*          :                                                   *
 '****************************************************************
-trisb = %0000000
-numero var portb   
-pausa var WORD
-pausa = 40
-trisa = 0
-cmcon = 7
-num VAR WORD
-num2 VAR WORD
-porta = 0
-x var word
-tiempo var word
-tiempo = 2
+CMCON = 7 'Pines del PORTA como digitales 
 
+TRISB = 0 'Pines puerto B como salidas  
+TRISA = 0 'Pines puerto B como salidas  
+PORTA = 0 'Modo de los pines del pueto A inician en 0
+
+pausaConteo con 20 'Pausa cambio de numero 
+pausa CON 40       'Pausa para toggle de transistores  
+
+'Variables para almacenar valores de decena y unidad 
+decena VAR WORD    
+unidad VAR WORD
+
+'Pines donde van conectados los transistores.
+transistorUnidad var porta.1
+transistorDecena var porta.0
+
+'Constantes para mostrar numeros en el display. 
 n0 CON %1000000
 n1 CON %1111001
 n2 CON %0100100
@@ -32,40 +37,44 @@ n7 CON %1111000
 n8 CON %0000000
 n9 CON %0010000
 
-secuencia var BYTE[10]
-SECUENCIA[0] = n0
-SECUENCIA[1] = N1
-SECUENCIA[2] = N2
-SECUENCIA[3] = N3
-SECUENCIA[4] = N4
-SECUENCIA[5] = N5
-SECUENCIA[6] = N6
-SECUENCIA[7] = N7
-SECUENCIA[8] = N8
-SECUENCIA[9] = N9
+'Array para luego iterar sobre cada valor
+digitoDisplay var BYTE[10]
 
+digitoDisplay[0] = n0
+digitoDisplay[1] = N1
+digitoDisplay[2] = N2
+digitoDisplay[3] = N3
+digitoDisplay[4] = N4
+digitoDisplay[5] = N5
+digitoDisplay[6] = N6
+digitoDisplay[7] = N7
+digitoDisplay[8] = N8
+digitoDisplay[9] = N9
 
-ciclo:
-
-   num = num + 1
-  if num == 10 then 
-     num = 0
-     num2 = num2 + 1
-  endif
-  if num2 == 10 then num2 = 0
- 
- for x = 1 to tiempo 
-  high porta.0
-  LOW porta.1 
-  numero = secuencia[num]
-  pause pausa
-  low porta.0
-  high porta.1 
-  numero = secuencia[num2]
-  pause pausa
+'Inicia el conteo de 0 a 99
+CONTAR:
+  X VAR BYTE 'Variable auxiliar
+  'Mostrar el numero en el los displays
+  for x = 1 to pausaConteo 
+    high transistorDecena 'Activar el transistor de la decena
+    LOW transistorUnidad  'Desactivar el transistor de la unidad
+    PORTB = digitoDisplay[decena] 'Mostrar el valor de la decena
+    pause pausa
+    low transistorDecena
+    high transistorUnidad 
+    PORTB = digitoDisplay[unidad]
+    pause pausa
   next
+
+  unidad = unidad + 1 'Incrementar la unidad
   
-
-goto ciclo
-
-
+  'Si la unidad llega a 10, aumentar la decena
+  if unidad == 10 then 
+    unidad = 0
+    decena = decena + 1
+  endif
+  
+  'Si la decena llega a 10, reiniciar
+  if decena == 10 then decena = 0
+   
+goto CONTAR
